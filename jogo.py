@@ -45,6 +45,7 @@ def Jogador(nome, simbolo):
     while True:
         while (not semaforo.jogo.existeVencedor()):
             time.sleep(1);
+            # CHama o semaforo para verificar e executar a jogada caso ninguem esteja jogando no momento
             semaforo.jogarPeca(nome, simbolo); # Jogar
         else:
 
