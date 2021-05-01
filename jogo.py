@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 '''
 Turma: CC3BN.
 
@@ -9,40 +11,51 @@ Integrantes: Claudia Thifany dos Santos (RA: 1903247);
 '''
 from tabuleiro import Tabuleiro, JOGADOR_BOLINHA, JOGADOR_XIZINHO;
 from threading import *;
+import random;
 import time;
 
 class MeuSemaforo:
     # Tabuleiro
     jogo = Tabuleiro();
-    # controlador
-    controle = Semaphore(0)
-    def verificaPosicao(self,x, y, jogador):
-        # Solicitando inicio do uso da variavel compartilhada para a thread atual
-        self.controle.acquire()
-        return self.jogo.posicaoValida( x, y, jogador);
-    # Joga um peça X ou O no tabuleiro
-    def jogarPeca(self, x, y, jogador):
-                
+    # controlador começando aberto
+    controle = Semaphore(1);
+    # Joga um peca X ou O no tabuleiro
+    def jogarPeca(self, nome, jogador):
+        self.controle.acquire();
+        if (self.jogo.existeVencedor()):
+            self.controle.release();
+            return;
+        print("\n"+nome+" "+self.jogo.pecas[jogador]+" pensando....")
+        # verificar se pode jogar
+        x = random.randrange(0, 2);
+        y = random.randrange(0, 2);
+        while not self.jogo.posicaoValida( x, y, jogador):
+            x = random.randrange(0, 3);
+            y = random.randrange(0, 3);
+            time.sleep(1);
+        print("Jogada do "+ nome+" "+self.jogo.pecas[jogador])
         self.jogo.colocarPeca( x, y, jogador)
         # Finalizando area de excução da thread atual para a proxima usar
-        self.controle.release()
+        self.controle.release();
+        print(self.jogo.imprimir());
 
 def Jogador(nome, simbolo):
     global semaforo;
     # loop da tread
     while True:
         while (not semaforo.jogo.existeVencedor()):
-            print("Ainda não existe um ganhador! Vou jogar :)")
-            # verificar se pode jogar
-            #while <Condição de poder ou não jogar>:
-                # Jogar
-                # Verificar se alguem venceu
-        time.sleep(4)
+            time.sleep(1);
+            semaforo.jogarPeca(nome, simbolo); # Jogar
+        else:
+
+            return 0;
+            # verifica se alguem venceu
+    time.sleep(1)
 
 semaforo = MeuSemaforo();
 
-jogador1 = Thread(target = Jogador, args = ('P1', JOGADOR_BOLINHA))
-jogador2 = Thread(target = Jogador, args = ('P2', JOGADOR_XIZINHO))
+jogador1 = Thread(target = Jogador, args = ('Jogador 1', JOGADOR_BOLINHA))
+jogador2 = Thread(target = Jogador, args = ('Jogador 2', JOGADOR_XIZINHO))
 
 jogador1.start();
 jogador2.start();
